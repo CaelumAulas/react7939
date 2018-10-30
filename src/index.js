@@ -13,8 +13,18 @@ import './assets/css/novoTweet.css'
 // import './index.css';
 
 
-import App from './App';
+// import App from './App.js';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+// Sistema de roteamento
+import { BrowserRouter } from 'react-router-dom'
+import Routes from './routes';
+// 1 - URL é critério master
+// se tiver logado vai pra home
+
+ReactDOM.render(
+    <BrowserRouter>
+        <Routes/>
+    </BrowserRouter>
+    , document.getElementById('root'));
 registerServiceWorker();

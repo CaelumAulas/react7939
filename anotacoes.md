@@ -85,3 +85,6 @@ Array.prototype.map = function(funcao) {
 - https://www.amazon.com.br/JavaScript-Good-Parts-English-ebook/dp/B0026OR2ZY?tag=goog0ef-20&smid=A18CNA8NWQSYHH&ascsubtag=go_1366271959_58245915327_265589414315_pla-476553242118_c_
 - Livros da série You Don't know js: https://www.google.com.br/search?q=you+dont+know+js&oq=you+dont+know+js&aqs=chrome..69i57j0l5.2037j0j4&sourceid=chrome&ie=UTF-8
 - https://martinfowler.com/articles/201803-refactoring-2nd-ed.html
+
+## Curso Devtools
+- https://www.youtube.com/watch?v=XUgfwYzv-WQ&list=PLOU2XLYxmsILUKyjDYUVYLeq7yyTxM_3d

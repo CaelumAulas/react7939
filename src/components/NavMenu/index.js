@@ -1,7 +1,13 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
 import './navMenu.css'
 
 class NavMenu extends Component {
+    logout = (infosDoEvento) => {
+        infosDoEvento.preventDefault()
+        localStorage.removeItem('TOKEN')
+        this.props.history.push('/login')
+    }
     render() {
         return (
             <nav className="navMenu">
@@ -19,7 +25,7 @@ class NavMenu extends Component {
                     <a href="/" className="navMenu__link">Hashtags</a>
                 </li>
                 <li className="navMenu__item">
-                    <a href="/" className="navMenu__link">Logout</a>
+                    <a href="/" onClick={this.logout} className="navMenu__link">Logout</a>
                 </li>
                 </ul>
             </nav>
@@ -27,4 +33,4 @@ class NavMenu extends Component {
     }
 }
 
-export default NavMenu
+export default withRouter(NavMenu)
