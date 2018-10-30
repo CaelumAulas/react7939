@@ -13,6 +13,29 @@ class App extends Component {
         novoTweet: 'um tweet dsudashdashu',        
         tweets: ['alo alo', 'w brazil']
       }
+      
+    //   this.adicionaTweet = this.adic÷ionaTweet.bind(this)
+  }
+  
+  adicionaTweet = (infosDoEvento) => {
+    infosDoEvento.preventDefault()
+
+    const novoTweet = this.state.novoTweet
+    // this.state.tweets.push(novoTweet)
+    if(novoTweet) {
+        this.setState({
+            tweets: [novoTweet, ...this.state.tweets],
+            novoTweet: ''
+        })
+    }
+    /*
+        ** Mini desafio: Limpar o campo do formulário depois de criar
+        um tweet novo
+    */
+    // Tela atualizando com react
+    // - setState faz isso tudo :)
+        // - state mudou
+        // - render() é chamado
   }
 
   render() {
@@ -24,7 +47,7 @@ class App extends Component {
         <div className="container">
             <Dashboard>
                 <Widget>
-                    <form className="novoTweet">
+                    <form className="novoTweet" onSubmit={this.adicionaTweet}>
                         <div className="novoTweet__editorArea">
                             {/* Faxer o <span> ter a classe: novoTweet__status somente quando
                             o this.state.novoTweet.length for maior que 140 caracteres */}
