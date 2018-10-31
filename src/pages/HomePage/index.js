@@ -5,29 +5,35 @@ import Dashboard from '../../components/Dashboard'
 import Widget from '../../components/Widget'
 import TrendsArea from '../../components/TrendsArea'
 import Tweet from '../../components/Tweet'
+import Modal from '../../components/Modal';
 
 class App extends Component {
     constructor() {
         super()
         this.state = {
             novoTweet: 'um tweet dsudashdashu',
-            tweets: []
+            tweets: [],
+            tweetAtivo: {}
         }
         //   this.adicionaTweet = this.adic÷ionaTweet.bind(this)
-        console.log('constructor')
     }
 
     // Mostrar uma mensagem enquanto os tweets carregam...
     componentDidMount() {
-        console.log('didMount')
+        window.store.subscribe(() => {
+            this.setState({
+                tweets: window.store.getState() 
+            })
+        })
         fetch(`http://twitelum-api.herokuapp.com/tweets?X-AUTH-TOKEN=${localStorage.getItem('TOKEN')}`)
         .then((respostaDoServer)  => {
             return respostaDoServer.json()
         })
         .then((tweetsVindosDoServer) => {
-            this.setState({
-                tweets: tweetsVindosDoServer
-            })
+            window.store.dispatch({ type: 'CARREGA_TWEETS', tweets: tweetsVindosDoServer })
+            // this.setState({
+            //     tweets: tweetsVindosDoServer
+            // })
         })
     }
 
@@ -63,8 +69,41 @@ class App extends Component {
         // - render() é chamado
     }
 
+    removeTweet = (idDoTweetQueVaiSumir) => {
+        // console.log('removendo o tweet!', idDoTweetQueVaiSumir)
+        // console.log('lista antes', this.state.tweets)
+        const listaAtualizada = this.state.tweets.filter((tweetAtual) => {
+            return tweetAtual._id !== idDoTweetQueVaiSumir
+        })
+        // console.log('listaAtualizada', listaAtualizada)
+        fetch(`http://twitelum-api.herokuapp.com/tweets/${idDoTweetQueVaiSumir}?X-AUTH-TOKEN=${localStorage.getItem('TOKEN')}`, {
+            method: 'DELETE'
+        })
+        .then((resposta) => resposta.json())
+        .then((respostaConvertida) => {
+            this.setState({
+                tweets: listaAtualizada
+            })
+            this.fechaModal()
+        })
+    }
+
+    fechaModal = () => {
+        this.setState({
+            tweetAtivo: {}
+        })
+    }
+
+    abreModalDeTweet = (idDoTweetQueVaiFicarAtivo) => {
+        const tweetClicado = this.state.tweets.find((tweetAtual) => {
+            return tweetAtual._id === idDoTweetQueVaiFicarAtivo
+        })
+        this.setState({
+            tweetAtivo: tweetClicado
+        })
+    }
+
     render() {
-        console.log('render')
         return (
             <Fragment>
                 <Cabecalho>
@@ -122,23 +161,54 @@ class App extends Component {
                                 {
                                     this.state.tweets.map((tweetAtual, indice) => {
                                         return <Tweet
-                                            key={indice}
+                                            key={tweetAtual._id}
+                                            id={tweetAtual._id}
                                             texto={tweetAtual.conteudo}
-                                            usuario={tweetAtual.usuario} />
+                                            usuario={tweetAtual.usuario}
+                                            totalLikes={tweetAtual.totalLikes}
+                                            likeado={tweetAtual.likeado}
+                                            removivel={tweetAtual.removivel}
+                                            removeHandler={() => { this.removeTweet(tweetAtual._id) } }
+                                            abreModalHandler={() => {
+                                                this.abreModalDeTweet(tweetAtual._id) } }
+                                            />
                                     })
                                 }
                                 {
                                     this.state.tweets.length === 0
-                                    ? <Tweet texto="Carregando..." isLoading={true} usuario={ { foto: 'https://placehold.it/50x50' } }  />
+                                    ? <Tweet
+                                        texto="Carregando..."
+                                        isLoading={true}
+                                        usuario={ { foto: 'https://placehold.it/50x50' } }  />
                                     : ''
                                 }
                             </div>
                         </Widget>
                     </Dashboard>
                 </div>
+
+                <Modal isAberto={Boolean(this.state.tweetAtivo._id)} onFechandoOModal={this.fechaModal}>
+                    {/* 
+                        # Desafio
+                        - Quando remover o tweet, fechar o modal!
+                     */}
+                    <Widget>
+                        <Tweet 
+                            id={ this.state.tweetAtivo._id }
+                            texto={ this.state.tweetAtivo.conteudo }
+                            usuario={ this.state.tweetAtivo.usuario }
+                            totalLikes={ this.state.tweetAtivo.totalLikes }
+                            likeado={this.state.tweetAtivo.likeado}
+                            removivel={this.state.tweetAtivo.removivel}
+                            removeHandler={() => {
+                                this.removeTweet(this.state.tweetAtivo._id) } }
+                        />
+                    </Widget>
+                </Modal>
             </Fragment>
         );
     }
 }
 
 export default App;
+

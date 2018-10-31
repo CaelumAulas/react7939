@@ -88,3 +88,7 @@ Array.prototype.map = function(funcao) {
 
 ## Curso Devtools
 - https://www.youtube.com/watch?v=XUgfwYzv-WQ&list=PLOU2XLYxmsILUKyjDYUVYLeq7yyTxM_3d
+
+
+## Desafio pós curso:
+- Recriar isso em React: https://www.felipefialho.com/css-components

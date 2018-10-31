@@ -21,6 +21,7 @@ import { BrowserRouter } from 'react-router-dom'
 import Routes from './routes';
 // 1 - URL é critério master
 // se tiver logado vai pra home
+import './store'
 
 ReactDOM.render(
     <BrowserRouter>
