@@ -4,7 +4,7 @@ import NavMenu from '../../components/NavMenu'
 import Dashboard from '../../components/Dashboard'
 import Widget from '../../components/Widget'
 import TrendsArea from '../../components/TrendsArea'
-import Tweet from '../../components/Tweet'
+import Tweet from '../../containers/TweetContainer'
 import Modal from '../../components/Modal';
 import PropTypes from 'prop-types'
 import * as TweetsActions from '../../actions/TweetsActions'
@@ -43,13 +43,6 @@ class App extends Component {
         this.setState({
             novoTweet: ''
         })
-    }
-
-    removeTweet = (idDoTweetQueVaiSumir) => {
-        this.context.store.dispatch(TweetsActions.remove(idDoTweetQueVaiSumir))
-            .then(() => {
-                this.fechaModal()
-            })
     }
 
     fechaModal = () => {
@@ -136,7 +129,6 @@ class App extends Component {
                                             totalLikes={tweetAtual.totalLikes}
                                             likeado={tweetAtual.likeado}
                                             removivel={tweetAtual.removivel}
-                                            removeHandler={() => { this.removeTweet(tweetAtual._id) }}
                                             abreModalHandler={() => {
                                                 this.abreModalDeTweet(tweetAtual._id)
                                             }}
@@ -157,10 +149,6 @@ class App extends Component {
                 </div>
 
                 <Modal isAberto={Boolean(this.state.tweetAtivo._id)} onFechandoOModal={this.fechaModal}>
-                    {/* 
-                        # Desafio
-                        - Quando remover o tweet, fechar o modal!
-                     */}
                     <Widget>
                         <Tweet
                             id={this.state.tweetAtivo._id}
@@ -169,8 +157,8 @@ class App extends Component {
                             totalLikes={this.state.tweetAtivo.totalLikes}
                             likeado={this.state.tweetAtivo.likeado}
                             removivel={this.state.tweetAtivo.removivel}
-                            removeHandler={() => {
-                                this.removeTweet(this.state.tweetAtivo._id)
+                            onRemoveTweet={() => {
+                                this.fechaModal()
                             }}
                         />
                     </Widget>

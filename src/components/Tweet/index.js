@@ -2,6 +2,12 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './tweet.css'
 
+// 2 tipos de componentes
+// - Container Components
+    // - Gerencia state
+    // - Acessa a store
+// - Presentational Components
+
 class Tweet extends Component {
     constructor(props) {
         super()
@@ -10,6 +16,8 @@ class Tweet extends Component {
             likeado: props.likeado
         }
     }
+
+
 
     likeHandler = () => {
         // this.props.totalLikes = this.props.totalLikes + 1
