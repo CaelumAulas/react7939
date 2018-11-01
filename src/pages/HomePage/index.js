@@ -6,6 +6,8 @@ import Widget from '../../components/Widget'
 import TrendsArea from '../../components/TrendsArea'
 import Tweet from '../../components/Tweet'
 import Modal from '../../components/Modal';
+import PropTypes from 'prop-types'
+import * as TweetsActions from '../../actions/TweetsActions'
 
 class App extends Component {
     constructor() {
@@ -18,74 +20,36 @@ class App extends Component {
         //   this.adicionaTweet = this.adic÷ionaTweet.bind(this)
     }
 
-    // Mostrar uma mensagem enquanto os tweets carregam...
+    static contextTypes = {
+        store: PropTypes.object
+    }
+    // import * as TweetsActions from '../../actions/TweetsActions'
     componentDidMount() {
-        window.store.subscribe(() => {
+        this.context.store.subscribe(() => {
             this.setState({
-                tweets: window.store.getState() 
+                tweets: this.context.store.getState()
             })
         })
-        fetch(`http://twitelum-api.herokuapp.com/tweets?X-AUTH-TOKEN=${localStorage.getItem('TOKEN')}`)
-        .then((respostaDoServer)  => {
-            return respostaDoServer.json()
-        })
-        .then((tweetsVindosDoServer) => {
-            window.store.dispatch({ type: 'CARREGA_TWEETS', tweets: tweetsVindosDoServer })
-            // this.setState({
-            //     tweets: tweetsVindosDoServer
-            // })
-        })
+        TweetsActions.carrega(this.context.store.dispatch)
     }
 
     adicionaTweet = (infosDoEvento) => {
         infosDoEvento.preventDefault()
-
         const novoTweet = this.state.novoTweet
-        // this.state.tweets.push(novoTweet)
-        if (novoTweet) {
-            fetch(`http://twitelum-api.herokuapp.com/tweets?X-AUTH-TOKEN=${localStorage.getItem('TOKEN')}`, {
-                    method: 'POST',
-                    body: JSON.stringify({ conteudo: novoTweet })
-                })
-                .then((respostaDoServer) => {
-                    console.log('Tentou fazer algo no server...')
-                    return respostaDoServer.json()
-                })
-                .then((tweetMontadoNoServer) => {
-                    console.log('dadoQueVeioDoServer', tweetMontadoNoServer)
-                    this.setState({
-                        tweets: [tweetMontadoNoServer, ...this.state.tweets],
-                        novoTweet: ''
-                    })
-                })
-        }
-        /*
-            ** Mini desafio: Limpar o campo do formulário depois de criar
-            um tweet novo
-        */
-        // Tela atualizando com react
-        // - setState faz isso tudo :)
-        // - state mudou
-        // - render() é chamado
+        
+        // TweetsActions.adiciona(novoTweet)(this.context.store.dispatch)
+        this.context.store.dispatch(TweetsActions.adiciona(novoTweet))
+
+        this.setState({
+            novoTweet: ''
+        })
     }
 
     removeTweet = (idDoTweetQueVaiSumir) => {
-        // console.log('removendo o tweet!', idDoTweetQueVaiSumir)
-        // console.log('lista antes', this.state.tweets)
-        const listaAtualizada = this.state.tweets.filter((tweetAtual) => {
-            return tweetAtual._id !== idDoTweetQueVaiSumir
-        })
-        // console.log('listaAtualizada', listaAtualizada)
-        fetch(`http://twitelum-api.herokuapp.com/tweets/${idDoTweetQueVaiSumir}?X-AUTH-TOKEN=${localStorage.getItem('TOKEN')}`, {
-            method: 'DELETE'
-        })
-        .then((resposta) => resposta.json())
-        .then((respostaConvertida) => {
-            this.setState({
-                tweets: listaAtualizada
+        this.context.store.dispatch(TweetsActions.remove(idDoTweetQueVaiSumir))
+            .then(() => {
+                this.fechaModal()
             })
-            this.fechaModal()
-        })
     }
 
     fechaModal = () => {
@@ -103,6 +67,10 @@ class App extends Component {
         })
     }
 
+    // Tela atualizando com react
+    // - setState faz isso tudo :)
+    // - state mudou
+    // - render() é chamado
     render() {
         return (
             <Fragment>
@@ -168,19 +136,20 @@ class App extends Component {
                                             totalLikes={tweetAtual.totalLikes}
                                             likeado={tweetAtual.likeado}
                                             removivel={tweetAtual.removivel}
-                                            removeHandler={() => { this.removeTweet(tweetAtual._id) } }
+                                            removeHandler={() => { this.removeTweet(tweetAtual._id) }}
                                             abreModalHandler={() => {
-                                                this.abreModalDeTweet(tweetAtual._id) } }
-                                            />
+                                                this.abreModalDeTweet(tweetAtual._id)
+                                            }}
+                                        />
                                     })
                                 }
                                 {
                                     this.state.tweets.length === 0
-                                    ? <Tweet
-                                        texto="Carregando..."
-                                        isLoading={true}
-                                        usuario={ { foto: 'https://placehold.it/50x50' } }  />
-                                    : ''
+                                        ? <Tweet
+                                            texto="Carregando..."
+                                            isLoading={true}
+                                            usuario={{ foto: 'https://placehold.it/50x50' }} />
+                                        : ''
                                 }
                             </div>
                         </Widget>
@@ -193,15 +162,16 @@ class App extends Component {
                         - Quando remover o tweet, fechar o modal!
                      */}
                     <Widget>
-                        <Tweet 
-                            id={ this.state.tweetAtivo._id }
-                            texto={ this.state.tweetAtivo.conteudo }
-                            usuario={ this.state.tweetAtivo.usuario }
-                            totalLikes={ this.state.tweetAtivo.totalLikes }
+                        <Tweet
+                            id={this.state.tweetAtivo._id}
+                            texto={this.state.tweetAtivo.conteudo}
+                            usuario={this.state.tweetAtivo.usuario}
+                            totalLikes={this.state.tweetAtivo.totalLikes}
                             likeado={this.state.tweetAtivo.likeado}
                             removivel={this.state.tweetAtivo.removivel}
                             removeHandler={() => {
-                                this.removeTweet(this.state.tweetAtivo._id) } }
+                                this.removeTweet(this.state.tweetAtivo._id)
+                            }}
                         />
                     </Widget>
                 </Modal>

@@ -92,3 +92,7 @@ Array.prototype.map = function(funcao) {
 
 ## Desafio pós curso:
 - Recriar isso em React: https://www.felipefialho.com/css-components
+
+## Alternativa ao Redux:
+- https://www.npmjs.com/package/pubsub-js
+- https://mobx.js.org/ 
