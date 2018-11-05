@@ -27,7 +27,8 @@ class App extends Component {
     componentDidMount() {
         this.context.store.subscribe(() => {
             this.setState({
-                tweets: this.context.store.getState()
+                tweets: this.context.store.getState().tweets.listaDeTweets,
+                tweetAtivo: this.context.store.getState().tweets.tweetAtivo
             })
         })
         TweetsActions.carrega(this.context.store.dispatch)
@@ -46,18 +47,11 @@ class App extends Component {
     }
 
     fechaModal = () => {
-        this.setState({
-            tweetAtivo: {}
-        })
+        this.context.store.dispatch({ type: 'FECHA_MODAL' })
     }
 
     abreModalDeTweet = (idDoTweetQueVaiFicarAtivo) => {
-        const tweetClicado = this.state.tweets.find((tweetAtual) => {
-            return tweetAtual._id === idDoTweetQueVaiFicarAtivo
-        })
-        this.setState({
-            tweetAtivo: tweetClicado
-        })
+        this.context.store.dispatch({ type: 'ABRE_MODAL', idDoTweet: idDoTweetQueVaiFicarAtivo })
     }
 
     // Tela atualizando com react
@@ -163,6 +157,18 @@ class App extends Component {
                         />
                     </Widget>
                 </Modal>
+
+                {
+                    this.context.store.getState().notificacao &&
+                    <div className="notificacaoMsg"
+                        onAnimationEnd={
+                            () => this.context
+                                .store
+                                .dispatch({ type: 'REMOVE_NOTIFICACAO' })
+                    }>
+                        { this.context.store.getState().notificacao }
+                    </div>
+                }
             </Fragment>
         );
     }

@@ -1,28 +1,100 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, combineReducers } from 'redux'
 import thunk from 'redux-thunk'
 
-function tweetsReducer(stateDaStore = [], acaoPassada) {
+const stateInicial = { listaDeTweets: [], tweetAtivo: {} }
+function tweetsReducer(stateDaStore = stateInicial, acaoPassada) {
     if(acaoPassada.type === 'CARREGA_TWEETS') {
-        return acaoPassada.tweets
+        return {
+            ...stateDaStore,
+            listaDeTweets: acaoPassada.tweets
+        }
     }
     
     if(acaoPassada.type === 'ADD_TWEET') {
-        return [acaoPassada.tweet, ...stateDaStore]
+        return {
+            ...stateDaStore,
+            listaDeTweets: [acaoPassada.tweet, ...stateDaStore.listaDeTweets]
+        }
     }
     
     if(acaoPassada.type === 'REMOVE_TWEET') {
-        const listaDeTweets = stateDaStore
+        const listaDeTweets = stateDaStore.listaDeTweets
         const idDoTweetQueVaiSumir = acaoPassada.idDoTweet
         const listaAtualizada = listaDeTweets.filter((tweetAtual) => {
             return tweetAtual._id !== idDoTweetQueVaiSumir
         })
-        return listaAtualizada
+        return {
+            ...stateDaStore,
+            listaDeTweets: listaAtualizada
+        }
     }
 
+    if(acaoPassada.type === 'ABRE_MODAL') {
+        const tweetClicado = stateDaStore.listaDeTweets.find((tweetAtual) => {
+            return tweetAtual._id === acaoPassada.idDoTweet
+        })
+
+        return {
+            ...stateDaStore, // spread
+            tweetAtivo: tweetClicado
+        }
+    }
+
+    if(acaoPassada.type === 'FECHA_MODAL') {
+        return {
+            ...stateDaStore,
+            tweetAtivo: stateInicial.tweetAtivo
+        }
+    }
+
+    if(acaoPassada.type === 'LIKE') {
+        const listaNova = stateDaStore.listaDeTweets.map((tweetAtual) => {
+            if(tweetAtual._id === acaoPassada.idDoTweet) {
+                let likeado = tweetAtual.likeado;
+                let totalLikes = tweetAtual.totalLikes;
+                
+                if(likeado) {
+                    totalLikes = totalLikes - 1
+                } else {
+                    totalLikes = totalLikes + 1
+                }
+
+                tweetAtual.likeado = !likeado
+                tweetAtual.totalLikes = totalLikes
+            }
+
+            return tweetAtual
+        })
+        return {
+            ...stateDaStore,
+            listaDeTweets: listaNova
+        }
+    }
+    
     return stateDaStore
 }
 
-const store = createStore(tweetsReducer, applyMiddleware( thunk ))
+// store.dispatch({ type: 'ADD_NOTIFICACAO', msg: 'alo alo' })
+// store.dispatch({ type: 'REMOVE_NOTIFICACAO' })
+
+function notificacaoReducer(state = '', action = {}) {
+    if(action.type === 'ADD_NOTIFICACAO') {
+        return action.msg
+    }
+    if(action.type === 'REMOVE_NOTIFICACAO') {
+        return ''
+    }
+    return state
+}
+const store = createStore(combineReducers({
+        tweets: tweetsReducer,
+        notificacao: notificacaoReducer
+    }),
+    applyMiddleware( thunk ))
+
+window.store = store
+
+console.log(window.store.getState())
 export default store
 
 
